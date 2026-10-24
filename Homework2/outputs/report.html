@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>Mini SE Workflow · 需求→设计→代码 · 执行报告</title><style>
+:root{--bg:#0F1B2A;--card:#16283C;--line:#24384F;--fg:#E8F1F8;--muted:#93A7BC;
+--ok:#2A9D8F;--bad:#E76F51;--accent:#4EA8DE;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif;}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:19px;margin:36px 0 14px;padding-left:10px;border-left:4px solid var(--accent)}
+.sub{color:var(--muted);font-size:13px;margin-bottom:8px}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0 8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:14px 18px;min-width:132px}
+.kpi .v{font-size:24px;font-weight:700}
+.kpi .k{font-size:12px;color:var(--muted);margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:18px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;
+vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px}
+.ok{background:rgba(42,157,143,.18);color:#7EE0D1}
+.bad{background:rgba(231,111,81,.18);color:#FFA98F}
+.warn{background:rgba(230,168,23,.18);color:#F3C65A}
+.bar{height:16px;border-radius:6px;background:var(--ok);display:inline-block}
+.track{background:rgba(255,255,255,.04);border-radius:6px;flex:1;min-width:160px;
+height:16px;position:relative;overflow:hidden}
+.track .bar{position:absolute;top:0}
+details{margin:10px 0}
+summary{cursor:pointer;color:var(--accent);font-size:13px}
+pre{background:#0B1420;border:1px solid var(--line);border-radius:8px;padding:12px;
+overflow:auto;font-size:12px;line-height:1.55}
+code{font-family:Menlo,Consolas,monospace}
+.msg{border-left:3px solid var(--accent);padding:6px 0 6px 12px;margin:8px 0;
+font-size:13px}
+.msg .meta{color:var(--muted);font-size:11px}
+footer{margin-top:40px;color:var(--muted);font-size:12px;text-align:center}
+</style></head>
+<body><div class="wrap">
+<h1>Mini SE Workflow · 需求→设计→代码 · 执行报告</h1>
+<div class="sub">Mini Workflow MVP · 需求 → 设计 → 代码 · 生成于 2026-10-24 20:41:52</div>
+<div class="kpis"><div class="kpi"><div class="v">SUCCESS</div><div class="k">流程状态</div></div><div class="kpi"><div class="v">0.102s</div><div class="k">总耗时</div></div><div class="kpi"><div class="v">6 成功 / 0 失败</div><div class="k">节点执行</div></div><div class="kpi"><div class="v">6</div><div class="k">Agent 消息</div></div><div class="kpi"><div class="v">7</div><div class="k">产物件</div></div></div>
+
+<h2>1. 工作流编排图</h2>
+<div class="card"><svg xmlns="http://www.w3.org/2000/svg" width="436" height="658" viewBox="0 0 436 658" font-family="Menlo, Consolas, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#8899A6"/></marker><marker id="arrow-back" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#E76F51"/></marker></defs>
+<path d="M 218 86 C 218 125, 218 125, 218 164" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 218 222 C 218 261, 112 261, 112 300" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 218 222 C 218 261, 324 261, 324 300" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 112 358 C 112 397, 218 397, 218 436" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 324 358 C 324 397, 218 397, 218 436" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 218 494 C 218 533, 324 533, 324 572" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="279" y="533" font-size="11" fill="#8899A6">通过/放弃</text>
+<path d="M 218 494 C 218 533, 112 533, 112 572" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="173" y="533" font-size="11" fill="#8899A6">失败重试</text>
+<path d="M 112 572 C 2 532, 108 534, 218 494" fill="none" stroke="#E76F51" stroke-width="1.8" marker-end="url(#arrow-back)"/>
+<text x="175" y="533" font-size="11" fill="#E76F51">重新校验</text>
+<rect x="134" y="28" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="218" y="52" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">requirements</text>
+<text x="218" y="70" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">需求Agent</text>
+<rect x="134" y="164" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="218" y="188" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">design</text>
+<text x="218" y="206" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">设计Agent</text>
+<rect x="28" y="300" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="112" y="324" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">coding_impl</text>
+<text x="112" y="342" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">编码Agent(实现)</text>
+<rect x="240" y="300" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="324" y="324" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">coding_test</text>
+<text x="324" y="342" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">编码Agent(测试)</text>
+<rect x="134" y="436" width="168" height="58" rx="10" fill="#2A9D8F"/>
+<text x="218" y="460" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">verify</text>
+<text x="218" y="478" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">代码校验器</text>
+<rect x="28" y="572" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="112" y="596" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">fix</text>
+<text x="112" y="614" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">编码Agent(修复)</text>
+<rect x="240" y="572" width="168" height="58" rx="10" fill="#2A9D8F"/>
+<text x="324" y="596" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">summarize</text>
+<text x="324" y="614" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">汇总器</text>
+</svg></div>
+<div class="sub" style="margin-top:10px">蓝=Agent 节点，绿=工具/校验节点；
+橙色回边表示「校验失败 → 修复 → 重新校验」的循环。</div>
+
+<h2>2. 执行时间线</h2>
+<div class="card"><table>
+<tr><th>节点</th><th>轮次</th><th>时间轴</th><th>耗时</th><th>状态</th><th>摘要</th></tr>
+<tr><td><code>requirements</code></td><td>#1</td><td style="width:52%"><div class="track"><span class="bar" style="left:0.0%;width:1.2%"></span></div></td><td>0.0s</td><td><span class="badge ok">success</span></td><td>SRS 完成（835 字符，耗时 0.0s）</td></tr><tr><td><code>design</code></td><td>#1</td><td style="width:52%"><div class="track"><span class="bar" style="left:0.1%;width:1.2%"></span></div></td><td>0.0s</td><td><span class="badge ok">success</span></td><td>设计文档完成（1148 字符，耗时 0.0s）</td></tr><tr><td><code>coding_impl</code></td><td>#1</td><td style="width:52%"><div class="track"><span class="bar" style="left:0.4%;width:1.2%"></span></div></td><td>0.0s</td><td><span class="badge ok">success</span></td><td>实现 193 行（耗时 0.0s）</td></tr><tr><td><code>coding_test</code></td><td>#1</td><td style="width:52%"><div class="track"><span class="bar" style="left:0.9%;width:1.2%"></span></div></td><td>0.0s</td><td><span class="badge ok">success</span></td><td>测试 122 行（耗时 0.0s）</td></tr><tr><td><code>verify</code></td><td>#1</td><td style="width:52%"><div class="track"><span class="bar" style="left:1.3%;width:99.0%"></span></div></td><td>0.101s</td><td><span class="badge ok">success</span></td><td>校验通过</td></tr><tr><td><code>summarize</code></td><td>#1</td><td style="width:52%"><div class="track"><span class="bar" style="left:100.1%;width:1.2%"></span></div></td><td>0.0s</td><td><span class="badge ok">success</span></td><td>汇总完成（6 个产物）</td></tr>
+</table></div>
+
+<h2>3. Agent 消息流（6 条）</h2>
+<div class="card"><div class="msg"><div class="meta">#1 · 需求Agent → 设计Agent · artifact</div>需求规格已完成，共 835 字符；请基于 01_requirements.md 进行设计。</div><div class="msg"><div class="meta">#2 · 设计Agent → 编码Agent(实现) · artifact</div>设计说明书已完成，请基于 02_design.md 开始工作。</div><div class="msg"><div class="meta">#3 · 设计Agent → 编码Agent(测试) · artifact</div>设计说明书已完成，请基于 02_design.md 开始工作。</div><div class="msg"><div class="meta">#4 · 编码Agent(实现) → 代码校验器 · artifact</div>实现代码已就绪（193 行），请等待校验。</div><div class="msg"><div class="meta">#5 · 编码Agent(测试) → 代码校验器 · artifact</div>单元测试已就绪（122 行），请等待校验。</div><div class="msg"><div class="meta">#6 · 代码校验器 → 编排器 · status</div>校验通过，进入汇总</div></div>
+
+<h2>4. 共享状态产物（Blackboard）</h2>
+<div class="card"><details><summary>00_requirement.md — v1 · by user · 170 字符</summary><pre><code>请实现一个中缀算术表达式计算器的 Python 库，要求：1) 支持加(+)、减(-)、乘(*)、除(/)、取模(%)、幂(**) 与括号；2) 支持一元正负号与小数、科学计数法；3) 对括号不匹配、除零、非法字符给出明确的中文错误信息；4) 提供 evaluate(expression: str) -&gt; float 作为唯一对外主入口。</code></pre></details><details><summary>00_summary.md — v1 · by summarize · 911 字符</summary><pre><code># 交付物清单
+
+- 原始需求：请实现一个中缀算术表达式计算器的 Python 库，要求：1) 支持加(+)、减(-)、乘(*)、除(/)、取模(%)、幂(**) 与括号；2) 支持一元正负号与小数、科学计数法；3) 对括号不匹配、除零、非法字符给出明确的中文错误信息；4
+- 流程结果：✅ 端到端跑通
+- 修复轮次：0
+- 节点执行：6 次，累计 0.10s
+- Agent 消息：6 条
+
+## 产物
+
+| 文件 | 说明 | 版本 | 产出者 |
+|------|------|------|--------|
+| `00_requirement.md` | 原始需求（用户输入） | v1 | user |
+| `01_requirements.md` | 需求规格说明书（需求Agent 产出） | v1 | requirements |
+| `02_design.md` | 软件设计说明书（设计Agent 产出） | v1 | design |
+| `03_verify_report.md` | 代码校验报告（校验器产出） | v1 | verify |
+| `solution.py` | 实现代码（编码Agent 产出） | v1 | coding_impl |
+| `test_solution.py` | 单元测试（编码Agent 产出） | v1 | coding_test |
+
+## 节点耗时
+
+| 节点 | 轮次 | 耗时 | 状态 |
+|------|------|------|------|
+| requirements | #1 | 0.0s | success |
+| design | #1 | 0.0s | success |
+| coding_impl | #1 | 0.0s | success |
+| coding_test | #1 | 0.0s | success |
+| verify | #1 | 0.101s | success |
+| summarize | #1 | 0.0s | success |
+
+&gt; 生成时间：2026-10-24 20:41:52</code></pre></details><details><summary>01_requirements.md — v1 · by requirements · 835 字符</summary><pre><code>```markdown
+# 需求规格说明书
+
+## 1. 项目概述
+提供一个中缀算术表达式计算器库，输入表达式字符串，返回计算结果。
+
+## 2. 术语表
+- 表达式：由数字、运算符、括号组成的单行字符串。
+- 调度场算法：把中缀表达式转成逆波兰式的经典算法。
+
+## 3. 功能需求
+- FR-01 支持加(+)、减(-)、乘(*)、除(/)、取模(%)、幂(**) 六种运算
+- FR-02 支持括号改变运算优先级，支持嵌套括号
+- FR-03 支持一元正负号，且 `-2**2` 应等于 -4
+- FR-04 支持整数、小数与科学计数法（如 1.5e2）
+- FR-05 幂运算为右结合，即 `2**3**2` 应等于 512
+
+## 4. 非功能需求
+- NFR-01 仅使用 Python 标准库，不引入第三方依赖
+- NFR-02 所有错误信息使用中文，便于定位问题
+- NFR-03 单文件模块，便于分发
+
+## 5. 输入输出约定
+- 输入：`expression: str`
+- 输出：`float`
+- 异常：表达式非法时抛出 `ExpressionError`（继承自 `ValueError`）
+
+## 6. 验收标准
+- AC-01 `evaluate(&quot;2+3*4&quot;)` == 14（乘法优先级高于加法）
+- AC-02 `evaluate(&quot;(2+3)*4&quot;)` == 20（括号优先）
+- AC-03 `evaluate(&quot;2**3**2&quot;)` == 512（幂右结合）
+- AC-04 `evaluate(&quot;1/0&quot;)` 抛出中文除零错误
+- AC-05 `evaluate(&quot;(1+2&quot;)` 抛出中文括号不匹配错误
+- AC-06 `evaluate(&quot;&quot;)` 抛出空表达式错误
+
+## 7. 假设与约束
+- 假设输入为单行表达式，不做多行处理。
+- 假设数值范围在 Python float 可表示范围内，溢出不额外处理。
+
+```</code></pre></details><details><summary>02_design.md — v1 · by design · 1148 字符</summary><pre><code>```markdown
+# 软件设计说明书
+
+## 1. 架构总览
+单模块 `solution.py`，采用经典三段式：词法分析 → 调度场算法（Shunting-yard）
+转逆波兰式 → 逆波兰式求值。全程无外部依赖。
+
+## 2. 模块划分
+| 模块 | 职责 |
+|------|------|
+| 词法分析 `tokenize` | 把字符串切成 `(类型, 值)` 序列 |
+| 中缀转后缀 `_shunting_yard` | 处理优先级与结合性 |
+| 求值 `_eval_rpn` | 计算逆波兰式 |
+| 对外入口 `evaluate` | 串起上述三步，做入参校验 |
+
+## 3. 接口定义
+```python
+class ExpressionError(ValueError): ...
+
+def tokenize(expression: str) -&gt; list[tuple[str, str]]:
+    &quot;&quot;&quot;把表达式切成 token 序列，类型取值为 &#x27;num&#x27; 或 &#x27;op&#x27;。&quot;&quot;&quot;
+
+def evaluate(expression: str) -&gt; float:
+    &quot;&quot;&quot;计算中缀表达式的值，非法时抛 ExpressionError。&quot;&quot;&quot;
+```
+
+## 4. 核心数据结构
+- 输出队列 `output: list`：存放数字(float)与运算符(str)的逆波兰序列
+- 运算符栈 `stack: list`：暂存运算符与左括号
+- 一元负号在栈中记为特殊运算符 `&#x27;u-&#x27;`，优先级 3，右结合
+
+## 5. 关键流程
+1. `tokenize` 用一条正则切出数字、`**`、其他运算符与括号；遇到无法识别的字符报错。
+2. 扫描 token：数字直接进输出队列；运算符按优先级弹栈后再入栈；括号单独处理。
+3. 收尾把栈中剩余运算符全部弹出，若遇到左括号说明括号不匹配。
+4. 对逆波兰序列求值，栈最终必须只剩一个元素。
+
+## 6. 异常与边界处理
+| 场景 | 处理 |
+|------|------|
+| 非法字符 | 抛出「非法字符：x（位置 n）」 |
+| 括号不匹配 | 区分「多余的右括号」与「缺少右括号」 |
+| 除零 / 取模零 | 抛出中文除零错误 |
+| 空表达式 | 抛 ExpressionError |
+| 非字符串入参 | 抛 TypeError |
+
+## 7. 测试要点
+- 优先级：`2+3*4` == 14
+- 结合性：`2**3**2` == 512、`8/4/2` == 1
+- 一元号：`-3+5` == 2、`-2**2` == -4
+- 异常路径：除零、括号不匹配、非法字符、空串
+
+```</code></pre></details><details><summary>03_verify_report.md — v1 · by verify · 2415 字符</summary><pre><code># 代码校验报告
+
+## 1. 语法检查
+- solution.py：通过
+- test_solution.py：通过
+
+## 2. 测试执行
+- 命令：`python test_solution.py`（超时 60.0s）
+- 返回码：0
+
+```
+test_add (__main__.TestBasicArithmetic.test_add) ... ok
+test_divide (__main__.TestBasicArithmetic.test_divide) ... ok
+test_mod (__main__.TestBasicArithmetic.test_mod) ... ok
+test_multiply (__main__.TestBasicArithmetic.test_multiply) ... ok
+test_power (__main__.TestBasicArithmetic.test_power) ... ok
+test_subtract (__main__.TestBasicArithmetic.test_subtract) ... ok
+test_divide_by_zero (__main__.TestErrorHandling.test_divide_by_zero) ... ok
+test_empty_expression (__main__.TestErrorHandling.test_empty_expression) ... ok
+test_extra_right_parenthesis (__main__.TestErrorHandling.test_extra_right_parenthesis) ... ok
+test_illegal_character (__main__.TestErrorHandling.test_illegal_character) ... ok
+test_missing_right_parenthesis (__main__.TestErrorHandling.test_missing_right_parenthesis) ... ok
+test_mod_by_zero (__main__.TestErrorHandling.test_mod_by_zero) ... ok
+test_non_string_input (__main__.TestErrorHandling.test_non_string_input) ... ok
+test_divide_is_left_associative (__main__.TestPrecedenceAndAssociativity.test_divide_is_left_associative) ... ok
+test_multiply_before_add (__main__.TestPrecedenceAndAssociativity.test_multiply_before_add) ... ok
+test_nested_parenthesis (__main__.TestPrecedenceAndAssociativity.test_nested_parenthesis) ... ok
+test_parenthesis (__main__.TestPrecedenceAndAssociativity.test_parenthesis) ... ok
+test_power_is_right_associative (__main__.TestPrecedenceAndAssociativity.test_power_is_right_associative) ... ok
+test_illegal_character (__main__.TestTokenize.test_illegal_character) ... ok
+test_power_token (__main__.TestTokenize.test_power_token) ... ok
+test_token_types (__main__.TestTokenize.test_token_types) ... ok
+test_float (__main__.TestUnaryAndNumberFormat.test_float) ... ok
+test_negative_scientific (__main__.TestUnaryAndNumberFormat.test_negative_scientific) ... ok
+test_scientific_notation (__main__.TestUnaryAndNumberFormat.test_scientific_notation) ... ok
+test_unary_minus (__main__.TestUnaryAndNumberFormat.test_unary_minus) ... ok
+test_unary_minus_with_power (__main__.TestUnaryAndNumberFormat.test_unary_minus_with_power) ... ok
+test_unary_plus (__main__.TestUnaryAndNumberFormat.test_unary_plus) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.001s
+
+OK
+
+（耗时 0.10s）
+```
+
+## 3. 结论：✅ 通过</code></pre></details><details><summary>solution.py — v1 · by coding_impl · 4743 字符</summary><pre><code>&quot;&quot;&quot;中缀算术表达式计算器。
+
+采用 词法分析 → 调度场算法 → 逆波兰求值 三段式实现。
+&quot;&quot;&quot;
+
+import re
+
+__all__ = [&quot;evaluate&quot;, &quot;tokenize&quot;, &quot;ExpressionError&quot;]
+
+
+class ExpressionError(ValueError):
+    &quot;&quot;&quot;表达式错误（中文提示）。&quot;&quot;&quot;
+
+
+_TOKEN = re.compile(
+    r&quot;\s*(?:(?P&lt;number&gt;\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|(?P&lt;pow&gt;\*\*)|(?P&lt;op&gt;[+\-*/%()]))&quot;
+)
+
+# 运算符 -&gt; (优先级, 结合性)；一元负号 &#x27;u-&#x27; 优先级 3，高于乘除、低于幂
+_OPS = {&quot;+&quot;: (1, &quot;L&quot;), &quot;-&quot;: (1, &quot;L&quot;), &quot;*&quot;: (2, &quot;L&quot;), &quot;/&quot;: (2, &quot;L&quot;), &quot;%&quot;: (2, &quot;L&quot;), &quot;**&quot;: (4, &quot;R&quot;)}
+
+_UNARY_PREC = 3
+
+
+def tokenize(expression: str) -&gt; list:
+    &quot;&quot;&quot;把表达式字符串切成 token 列表。
+
+    Args:
+        expression: 待切分的表达式字符串。
+
+    Returns:
+        形如 [(&quot;num&quot;, &quot;12&quot;), (&quot;op&quot;, &quot;+&quot;), ...] 的列表。
+
+    Raises:
+        ExpressionError: 遇到无法识别的字符。
+    &quot;&quot;&quot;
+    tokens = []
+    pos = 0
+    while pos &lt; len(expression):
+        if expression[pos].isspace():
+            pos += 1
+            continue
+        matched = _TOKEN.match(expression, pos)
+        if not matched:
+            raise ExpressionError(&quot;非法字符：%r（位置 %d）&quot; % (expression[pos], pos))
+        pos = matched.end()
+        if matched.group(&quot;number&quot;) is not None:
+            tokens.append((&quot;num&quot;, matched.group(&quot;number&quot;)))
+        elif matched.group(&quot;pow&quot;):
+            tokens.append((&quot;op&quot;, &quot;**&quot;))
+        else:
+            tokens.append((&quot;op&quot;, matched.group(&quot;op&quot;)))
+    return tokens
+
+
+def _apply(op: str, left: float, right: float) -&gt; float:
+    &quot;&quot;&quot;执行一次二元运算。
+
+    Args:
+        op: 运算符字符串。
+        left: 左操作数。
+        right: 右操作数。
+
+    Returns:
+        运算结果。
+
+    Raises:
+        ExpressionError: 除零或不支持的运算符。
+    &quot;&quot;&quot;
+    if op == &quot;+&quot;:
+        return left + right
+    if op == &quot;-&quot;:
+        return left - right
+    if op == &quot;*&quot;:
+        return left * right
+    if op == &quot;/&quot;:
+        if right == 0:
+            raise ExpressionError(&quot;除零错误&quot;)
+        return left / right
+    if op == &quot;%&quot;:
+        if right == 0:
+            raise ExpressionError(&quot;取模运算的除数为零&quot;)
+        return left % right
+    if op == &quot;**&quot;:
+        return left ** right
+    raise ExpressionError(&quot;不支持的运算符：%s&quot; % op)
+
+
+def _shunting_yard(tokens: list) -&gt; list:
+    &quot;&quot;&quot;把中缀 token 序列转成逆波兰式。
+
+    Args:
+        tokens: tokenize 的输出。
+
+    Returns:
+        逆波兰式列表，元素为 float 或运算符字符串。
+
+    Raises:
+        ExpressionError: 括号不匹配。
+    &quot;&quot;&quot;
+    output: list = []
+    stack: list = []
+    prev = None  # 上一个 token 的类型，用于判定一元正负号
+
+    for kind, value in tokens:
+        if kind == &quot;num&quot;:
+            output.append(float(value))
+            prev = &quot;num&quot;
+        elif value == &quot;(&quot;:
+            stack.append(value)
+            prev = &quot;op&quot;
+        elif value == &quot;)&quot;:
+            while stack and stack[-1] != &quot;(&quot;:
+                output.append(stack.pop())
+            if not stack:
+                raise ExpressionError(&quot;括号不匹配：多余的右括号&quot;)
+            stack.pop()
+            prev = &quot;num&quot;
+        else:
+            # 一元正负号：出现在开头，或紧跟在另一个运算符 / 左括号之后
+            if value in &quot;+-&quot; and (prev is None or prev == &quot;op&quot;):
+                if value == &quot;-&quot;:
+                    stack.append(&quot;u-&quot;)
+                prev = &quot;op&quot;
+                continue
+            prec, assoc = _OPS[value]
+            while stack and stack[-1] != &quot;(&quot;:
+                top = stack[-1]
+                top_prec = _UNARY_PREC if top == &quot;u-&quot; else _OPS[top][0]
+                if top_prec &gt; prec or (top_prec == prec and assoc == &quot;L&quot;):
+                    output.append(stack.pop())
+                else:
+                    break
+            stack.append(value)
+            prev = &quot;op&quot;
+
+    while stack:
+        top = stack.pop()
+        if top == &quot;(&quot;:
+            raise ExpressionError(&quot;括号不匹配：缺少右括号&quot;)
+        output.append(top)
+    return output
+
+
+def _eval_rpn(rpn: list) -&gt; float:
+    &quot;&quot;&quot;对逆波兰式求值。
+
+    Args:
+        rpn: _shunting_yard 的输出。
+
+    Returns:
+        计算结果。
+
+    Raises:
+        ExpressionError: 表达式不合法（缺操作数或多余操作数）。
+    &quot;&quot;&quot;
+    stack: list = []
+    for item in rpn:
+        if isinstance(item, float):
+            stack.append(item)
+        elif item == &quot;u-&quot;:
+            if not stack:
+                raise ExpressionError(&quot;一元负号缺少操作数&quot;)
+            stack.append(-stack.pop())
+        else:
+   </code></pre></details><details><summary>test_solution.py — v1 · by coding_test · 3323 字符</summary><pre><code>&quot;&quot;&quot;solution.py 的单元测试（覆盖正常 / 边界 / 异常三类路径）。&quot;&quot;&quot;
+
+import unittest
+
+from solution import ExpressionError, evaluate, tokenize
+
+
+class TestBasicArithmetic(unittest.TestCase):
+    &quot;&quot;&quot;正常路径。&quot;&quot;&quot;
+
+    def test_add(self):
+        self.assertAlmostEqual(evaluate(&quot;1+2&quot;), 3.0)
+
+    def test_subtract(self):
+        self.assertAlmostEqual(evaluate(&quot;10-4&quot;), 6.0)
+
+    def test_multiply(self):
+        self.assertAlmostEqual(evaluate(&quot;6*7&quot;), 42.0)
+
+    def test_divide(self):
+        self.assertAlmostEqual(evaluate(&quot;9/2&quot;), 4.5)
+
+    def test_mod(self):
+        self.assertAlmostEqual(evaluate(&quot;7%3&quot;), 1.0)
+
+    def test_power(self):
+        self.assertAlmostEqual(evaluate(&quot;2**10&quot;), 1024.0)
+
+
+class TestPrecedenceAndAssociativity(unittest.TestCase):
+    &quot;&quot;&quot;优先级与结合性。&quot;&quot;&quot;
+
+    def test_multiply_before_add(self):
+        self.assertAlmostEqual(evaluate(&quot;2+3*4&quot;), 14.0)
+
+    def test_parenthesis(self):
+        self.assertAlmostEqual(evaluate(&quot;(2+3)*4&quot;), 20.0)
+
+    def test_nested_parenthesis(self):
+        self.assertAlmostEqual(evaluate(&quot;((1+2)*(3+4))&quot;), 21.0)
+
+    def test_power_is_right_associative(self):
+        # 右结合：2 ** (3 ** 2) = 512，而非 (2 ** 3) ** 2 = 64
+        self.assertAlmostEqual(evaluate(&quot;2**3**2&quot;), 512.0)
+
+    def test_divide_is_left_associative(self):
+        self.assertAlmostEqual(evaluate(&quot;8/4/2&quot;), 1.0)
+
+
+class TestUnaryAndNumberFormat(unittest.TestCase):
+    &quot;&quot;&quot;一元符号与数字格式（边界）。&quot;&quot;&quot;
+
+    def test_unary_minus(self):
+        self.assertAlmostEqual(evaluate(&quot;-3+5&quot;), 2.0)
+
+    def test_unary_minus_with_power(self):
+        # 一元负号优先级低于幂：- (2 ** 2) = -4
+        self.assertAlmostEqual(evaluate(&quot;-2**2&quot;), -4.0)
+
+    def test_unary_plus(self):
+        self.assertAlmostEqual(evaluate(&quot;+7&quot;), 7.0)
+
+    def test_float(self):
+        self.assertAlmostEqual(evaluate(&quot;1.5*2&quot;), 3.0)
+
+    def test_scientific_notation(self):
+        self.assertAlmostEqual(evaluate(&quot;1.5e2&quot;), 150.0)
+
+    def test_negative_scientific(self):
+        self.assertAlmostEqual(evaluate(&quot;1e-2&quot;), 0.01)
+
+
+class TestErrorHandling(unittest.TestCase):
+    &quot;&quot;&quot;异常路径。&quot;&quot;&quot;
+
+    def test_divide_by_zero(self):
+        with self.assertRaises(ExpressionError):
+            evaluate(&quot;1/0&quot;)
+
+    def test_mod_by_zero(self):
+        with self.assertRaises(ExpressionError):
+            evaluate(&quot;5%0&quot;)
+
+    def test_missing_right_parenthesis(self):
+        with self.assertRaises(ExpressionError):
+            evaluate(&quot;(1+2&quot;)
+
+    def test_extra_right_parenthesis(self):
+        with self.assertRaises(ExpressionError):
+            evaluate(&quot;1+2)&quot;)
+
+    def test_illegal_character(self):
+        with self.assertRaises(ValueError):
+            evaluate(&quot;1 &amp; 2&quot;)
+
+    def test_empty_expression(self):
+        with self.assertRaises(ValueError):
+            evaluate(&quot;   &quot;)
+
+    def test_non_string_input(self):
+        with self.assertRaises(TypeError):
+            evaluate(123)
+
+
+class TestTokenize(unittest.TestCase):
+    &quot;&quot;&quot;词法分析。&quot;&quot;&quot;
+
+    def test_token_types(self):
+        tokens = tokenize(&quot;1 + 2&quot;)
+        self.assertEqual(tokens[0], (&quot;num&quot;, &quot;1&quot;))
+        self.assertEqual(tokens[1], (&quot;op&quot;, &quot;+&quot;))
+
+    def test_power_token(self):
+        self.assertIn((&quot;op&quot;, &quot;**&quot;), tokenize(&quot;2**3&quot;))
+
+    def test_illegal_character(self):
+        with self.assertRaises(ExpressionError):
+            tokenize(&quot;1 # 2&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    unittest.main(verbosity=2)</code></pre></details></div>
+
+<footer>Generated by MiniSE-Workflow-MVP · WorkflowEngine</footer>
+</div></body></html>

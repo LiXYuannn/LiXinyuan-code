@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="436" height="658" viewBox="0 0 436 658" font-family="Menlo, Consolas, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#8899A6"/></marker><marker id="arrow-back" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#E76F51"/></marker></defs>
+<path d="M 218 86 C 218 125, 218 125, 218 164" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 218 222 C 218 261, 112 261, 112 300" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 218 222 C 218 261, 324 261, 324 300" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 112 358 C 112 397, 218 397, 218 436" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 324 358 C 324 397, 218 397, 218 436" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M 218 494 C 218 533, 324 533, 324 572" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="279" y="533" font-size="11" fill="#8899A6">通过/放弃</text>
+<path d="M 218 494 C 218 533, 112 533, 112 572" fill="none" stroke="#8899A6" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="173" y="533" font-size="11" fill="#8899A6">失败重试</text>
+<path d="M 112 572 C 2 532, 108 534, 218 494" fill="none" stroke="#E76F51" stroke-width="1.8" marker-end="url(#arrow-back)"/>
+<text x="175" y="533" font-size="11" fill="#E76F51">重新校验</text>
+<rect x="134" y="28" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="218" y="52" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">requirements</text>
+<text x="218" y="70" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">需求Agent</text>
+<rect x="134" y="164" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="218" y="188" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">design</text>
+<text x="218" y="206" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">设计Agent</text>
+<rect x="28" y="300" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="112" y="324" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">coding_impl</text>
+<text x="112" y="342" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">编码Agent(实现)</text>
+<rect x="240" y="300" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="324" y="324" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">coding_test</text>
+<text x="324" y="342" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">编码Agent(测试)</text>
+<rect x="134" y="436" width="168" height="58" rx="10" fill="#2A9D8F"/>
+<text x="218" y="460" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">verify</text>
+<text x="218" y="478" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">代码校验器</text>
+<rect x="28" y="572" width="168" height="58" rx="10" fill="#1E6091"/>
+<text x="112" y="596" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">fix</text>
+<text x="112" y="614" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">编码Agent(修复)</text>
+<rect x="240" y="572" width="168" height="58" rx="10" fill="#2A9D8F"/>
+<text x="324" y="596" text-anchor="middle" font-size="14" font-weight="bold" fill="#FFFFFF">summarize</text>
+<text x="324" y="614" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">汇总器</text>
+</svg>
